@@ -2,11 +2,12 @@ import signal as signal
 import numpy as np
 import matplotlib.pyplot as plt
 
+Fs = 1000000
 w = np.linspace(1E-5, 0.5, 10000)
-f = w * (3.072E6/2)
+f = w * Fs
 
 # R is the decimation ratio, N is the filter order, M is a free number usually 1 or 2
-R = 32
+R = 10
 N = 4
 M = 1
 
