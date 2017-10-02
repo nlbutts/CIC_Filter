@@ -1,39 +1,493 @@
 <?xml version="1.0" encoding="utf-8"?>
 <blockRegMap version="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://cypress.com/xsd/cyblockregmap cyblockregmap.xsd" xmlns="http://cypress.com/xsd/cyblockregmap">
-  <block name="Clock_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="timer_clock" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Timer" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
+    <block name="VirtualMux_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="TimerHW" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="OneTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="VirtualMux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="VirtualMux_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <register name="Timer_GLOBAL_ENABLE" address="0x400043A3" bitWidth="8" desc="PM.ACT.CFG" hidden="false">
+      <field name="en_timer" from="3" to="0" access="RW" resetVal="" desc="Enable timer/counters." hidden="false" />
+    </register>
+    <register name="Timer_CONTROL" address="0x40004F00" bitWidth="8" desc="TMRx.CFG0" hidden="false">
+      <field name="EN" from="0" to="0" access="RW" resetVal="" desc="Enables timer/comparator." hidden="false" />
+      <field name="MODE" from="1" to="1" access="RW" resetVal="" desc="Mode. (0 = Timer; 1 = Comparator)" hidden="false">
+        <value name="Timer" value="0" desc="Timer mode. CNT/CMP register holds timer count value." />
+        <value name="Comparator" value="1" desc="Comparator mode. CNT/CMP register holds comparator threshold value." />
+      </field>
+      <field name="ONESHOT" from="2" to="2" access="RW" resetVal="" desc="Timer stops upon reaching stop condition defined by TMR_CFG bits. Can be restarted by asserting TIMER RESET or disabling and re-enabling block." hidden="false" />
+      <field name="CMP_BUFF" from="3" to="3" access="RW" resetVal="" desc="Buffer compare register. Compare register updates only on timer terminal count." hidden="false" />
+      <field name="INV" from="4" to="4" access="RW" resetVal="" desc="Invert sense of TIMEREN signal" hidden="false" />
+      <field name="DB" from="5" to="5" access="RW" resetVal="" desc="Deadband mode--Deadband phases phi1 and phi2 are outputted on CMP and TC output pins respectively." hidden="false">
+        <value name="Timer" value="0" desc="CMP and TC are output." />
+        <value name="Deadband" value="1" desc="PHI1 (instead of CMP) and PHI2 (instead of TC) are output." />
+      </field>
+      <field name="DEADBAND_PERIOD" from="7" to="6" access="RW" resetVal="" desc="Deadband Period" hidden="false" />
+    </register>
+    <register name="Timer_CONTROL2" address="0x40004F01" bitWidth="8" desc="TMRx.CFG1" hidden="false">
+      <field name="IRQ_SEL" from="0" to="0" access="RW" resetVal="" desc="Irq selection. (0 = raw interrupts; 1 = status register interrupts)" hidden="false" />
+      <field name="FTC" from="1" to="1" access="RW" resetVal="" desc="First Terminal Count (FTC). Setting this bit forces a single pulse on the TC pin when first enabled." hidden="false">
+        <value name="Disable FTC" value="0" desc="Disable the single cycle pulse, which signifies the timer is starting." />
+        <value name="Enable FTC" value="1" desc="Enable the single cycle pulse, which signifies the timer is starting." />
+      </field>
+      <field name="DCOR" from="2" to="2" access="RW" resetVal="" desc="Disable Clear on Read (DCOR) of Status Register SR0." hidden="false" />
+      <field name="DBMODE" from="3" to="3" access="RW" resetVal="" desc="Deadband mode (asynchronous/synchronous). CMP output pin is also affected when not in deadband mode (CFG0.DEADBAND)." hidden="false" />
+      <field name="CLK_BUS_EN_SEL" from="6" to="4" access="RW" resetVal="" desc="Digital Global Clock selection." hidden="false" />
+      <field name="BUS_CLK_SEL" from="7" to="7" access="RW" resetVal="" desc="Bus Clock selection." hidden="false" />
+    </register>
+    <register name="Timer_CONTROL3_" address="0x40004F02" bitWidth="8" desc="TMRx.CFG2" hidden="false">
+      <field name="TMR_CFG" from="1" to="0" access="RW" resetVal="" desc="Timer configuration (MODE = 0): 000 = Continuous; 001 = Pulsewidth; 010 = Period; 011 = Stop on IRQ" hidden="false">
+        <value name="Continuous" value="0" desc="Timer runs while EN bit of CFG0 register is set to '1'." />
+        <value name="Pulsewidth" value="1" desc="Timer runs from positive to negative edge of TIMEREN." />
+        <value name="Period" value="10" desc="Timer runs from positive to positive edge of TIMEREN." />
+        <value name="Irq" value="11" desc="Timer runs until IRQ." />
+      </field>
+      <field name="COD" from="2" to="2" access="RW" resetVal="" desc="Clear On Disable (COD). Clears or gates outputs to zero." hidden="false" />
+      <field name="ROD" from="3" to="3" access="RW" resetVal="" desc="Reset On Disable (ROD). Resets internal state of output logic" hidden="false" />
+      <field name="CMP_CFG" from="6" to="4" access="RW" resetVal="" desc="Comparator configurations" hidden="false">
+        <value name="Equal" value="0" desc="Compare Equal " />
+        <value name="Less than" value="1" desc="Compare Less Than " />
+        <value name="Less than or equal" value="10" desc="Compare Less Than or Equal ." />
+        <value name="Greater" value="11" desc="Compare Greater Than ." />
+        <value name="Greater than or equal" value="100" desc="Compare Greater Than or Equal " />
+      </field>
+      <field name="HW_EN" from="7" to="7" access="RW" resetVal="" desc="When set Timer Enable controls counting." hidden="false" />
+    </register>
+    <register name="Timer_PERIOD" address="0x40004F04" bitWidth="16" desc="TMRx.PER0 - Assigned Period" hidden="false" />
+    <register name="Timer_COUNTER" address="0x40004F06" bitWidth="16" desc="TMRx.CNT_CMP0 - Current Down Counter Value" hidden="false" />
+  </block>
+  <block name="Em_EEPROM_Dynamic" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
   <block name="cy_boot" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
-  <block name="cic_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
-  <block name="Status_Reg" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
-    <register name="Status_Reg_STATUS_REG" address="0x4000646B" bitWidth="8" desc="" hidden="false" />
-    <register name="Status_Reg_MASK_REG" address="0x4000648B" bitWidth="8" desc="" hidden="false" />
-    <register name="Status_Reg_STATUS_AUX_CTL_REG" address="0x4000649B" bitWidth="8" desc="" hidden="false">
-      <field name="FIFO0" from="5" to="5" access="RW" resetVal="" desc="FIFO0 clear" hidden="false">
-        <value name="ENABLED" value="1" desc="Enable counter" />
-        <value name="DISABLED" value="0" desc="Disable counter" />
+  <block name="cy_constant_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="adcDMA" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="WaveDAC8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
+    <block name="WaveDAC8_VDAC8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
+      <block name="viDAC8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+      <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+      <block name="ZeroTerminal_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+      <block name="cy_analog_noconnect_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+      <block name="ZeroTerminal_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+      <register name="VDAC8_PM_ACT_CFG" address="0x400043A8" bitWidth="8" desc="Active Power Mode Configuration Register 8" hidden="false">
+        <field name="en_dac" from="4" to="0" access="RW" resetVal="" desc="Enable DAC block(s). Populated subsystems are counted from the LSB" hidden="false" />
+      </register>
+      <register name="VDAC8_PM_STBY_CFG" address="0x400043B8" bitWidth="8" desc="Standby Power Mode Configuration Register 8" hidden="false">
+        <field name="en_dac" from="4" to="0" access="RW" resetVal="" desc="Enable DAC block(s). Populated subsystems are counted from the LSB" hidden="false" />
+      </register>
+      <register name="VDAC8_TR" address="0x4000460B" bitWidth="8" desc="VDAC8_TR" hidden="false">
+        <field name="tr" from="7" to="0" access="RW" resetVal="" desc="8 Calibration bits" hidden="false" />
+      </register>
+      <register name="VDAC8_CR0" address="0x4000582C" bitWidth="8" desc="DAC Block Control Register 0" hidden="false">
+        <field name="mode" from="4" to="4" access="R" resetVal="" desc="Mode Bit" hidden="false">
+          <value name="DAC_MODE_V" value="0" desc="voltage DAC" />
+          <value name="DAC_MODE_I" value="1" desc="current DAC" />
+        </field>
+        <field name="range" from="3" to="2" access="RW" resetVal="" desc="Ranges for mode=0 (VDAC) and mode=1 (IDAC)" hidden="false">
+          <value name="DAC_RANGE_0" value="00" desc="x0=0V to 4*vref (1.024V); 0 to 31.875uA" />
+          <value name="DAC_RANGE_1" value="01" desc="x1=0V to 16*vref (4.096V); 0 to 255uA" />
+          <value name="DAC_RANGE_2" value="10" desc="x0=0V to 4*vref (1.024V); 0 to 2.040mA" />
+          <value name="DAC_RANGE_3" value="11" desc="x1=0V to 16*vref (4.096V); not used" />
+        </field>
+        <field name="hs" from="1" to="1" access="RW" resetVal="" desc="High Speed Bit" hidden="false">
+          <value name="DAC_HS_LOWPOWER" value="0" desc="regular (low power)" />
+          <value name="DAC_HS_HIGHSPEED" value="1" desc="high speed (higher power)" />
+        </field>
+      </register>
+      <register name="VDAC8_CR1" address="0x4000582D" bitWidth="8" desc="DAC Block Control Register 1" hidden="false">
+        <field name="mx_data" from="5" to="5" access="RW" resetVal="" desc="Select DATA source" hidden="false">
+          <value name="MX_DATA_REG" value="0" desc="Select register source (DACxn_D)" />
+          <value name="MX_DATA_UDB" value="1" desc="Select UDB source" />
+        </field>
+        <field name="mx_idir" from="3" to="3" access="RW" resetVal="" desc="Mux selection for DAC current direction control" hidden="false">
+          <value name="MX_IDIR_REG" value="0" desc="Register source idirbit selected" />
+          <value name="MX_IDIR_UDB" value="1" desc="UDB ictrl selected" />
+        </field>
+        <field name="mx_ioff" from="1" to="1" access="RW" resetVal="" desc="Mux selection for DAC current off control" hidden="false">
+          <value name="MX_IOFF_REG" value="0" desc="Register source ioffbit selected" />
+          <value name="MX_IOFF_UDB" value="1" desc="UDB ictrl selected" />
+        </field>
+        <field name="reset_udb_en" from="4" to="4" access="RW" resetVal="" desc="DAC reset enable" hidden="false">
+          <value name="RESET_UDB_EN_DISABLE" value="0" desc="Disable DAC Reset Source from UDB (System reset always resets)" />
+          <value name="RESET_UDB_EN_ENABLE" value="1" desc="Enable DAC Reset Source from UDB" />
+        </field>
+      </register>
+      <register name="VDAC8_SW0" address="0x40005A98" bitWidth="8" desc="DAC Analog Routing Register 0" hidden="false">
+        <field name="v_ag1" from="1" to="1" access="RW" resetVal="" desc="Connect voltage output to analog global of same side" hidden="false">
+          <value name="AG_NC" value="0" desc="not connected" />
+          <value name="AG_CONNECTED" value="1" desc="Connect to Analog Global" />
+        </field>
+        <field name="v_ag0" from="0" to="0" access="RW" resetVal="" desc="Connect voltage output to analog global of same side" hidden="false">
+          <value name="AG_NC" value="0" desc="not connected" />
+          <value name="AG_CONNECTED" value="1" desc="Connect to Analog Global" />
+        </field>
+      </register>
+      <register name="VDAC8_SW2" address="0x40005A9A" bitWidth="8" desc="DAC Analog Routing Register 2" hidden="false">
+        <field name="v_abus3" from="3" to="3" access="RW" resetVal="" desc="Connect voltage output to analog (local) bus of the same side " hidden="false">
+          <value name="ABUS_NC" value="0" desc="not connected" />
+          <value name="ABUS_CONNECTED" value="1" desc="Connect to Analog (local) Bus" />
+        </field>
+        <field name="v_abus1" from="1" to="1" access="RW" resetVal="" desc="Connect voltage output to analog (local) bus of the same side " hidden="false">
+          <value name="ABUS_NC" value="0" desc="not connected" />
+          <value name="ABUS_CONNECTED" value="1" desc="Connect to Analog (local) Bus" />
+        </field>
+      </register>
+      <register name="VDAC8_SW3" address="0x40005A9B" bitWidth="8" desc="DAC Analog Routing Register 3" hidden="false">
+        <field name="iout" from="7" to="7" access="RW" resetVal="" desc="Connect current output to pad" hidden="false">
+          <value name="IOUT_NC" value="0" desc="not connected" />
+          <value name="IOUT_CONNECT" value="1" desc="Connect to pad" />
+        </field>
+        <field name="i_amx" from="4" to="4" access="RW" resetVal="" desc="Connect current output to Analog Mux Bus" hidden="false">
+          <value name="AMX_NC" value="0" desc="not connected" />
+          <value name="AMX_CONNECTED" value="1" desc="Connect to AMUXBUS" />
+        </field>
+        <field name="v_amx" from="0" to="0" access="RW" resetVal="" desc="Connect voltage output to Analog Mux Bus" hidden="false">
+          <value name="AMX_NC" value="0" desc="not connected" />
+          <value name="AMX_CONNECTED" value="1" desc="Connect to AMUXBUS" />
+        </field>
+      </register>
+      <register name="VDAC8_SW4" address="0x40005A9C" bitWidth="8" desc="DAC Analog Routing Register 4" hidden="false">
+        <field name="i_ag1" from="1" to="1" access="RW" resetVal="" desc="Connect current output to analog global of same side" hidden="false">
+          <value name="AG_NC" value="0" desc="not connected" />
+          <value name="AG_CONNECTED" value="1" desc="Connect to Analog Global" />
+        </field>
+        <field name="i_ag0" from="0" to="0" access="RW" resetVal="" desc="Connect current output to analog global of same side" hidden="false">
+          <value name="AG_NC" value="0" desc="not connected" />
+          <value name="AG_CONNECTED" value="1" desc="Connect to Analog Global" />
+        </field>
+      </register>
+      <register name="VDAC8_STROBE" address="0x40005A9F" bitWidth="8" desc="DAC Strobe Register" hidden="false">
+        <field name="mx_strobe" from="2" to="0" access="RW" resetVal="" desc="Strobe source selection" hidden="false">
+          <value name="MX_STROBE_BUSWRITE" value="000" desc="Select bus write strobe source (Enable gater regardless of strobe_en setting)" />
+          <value name="MX_STROBE_UDB_SRC" value="001" desc="Select UDB strobe source" />
+          <value name="MX_STROBE_NC_2" value="010" desc="NC" />
+          <value name="MX_STROBE_NC_3" value="011" desc="NC" />
+          <value name="MX_STROBE_CLK_A0_DIG" value="100" desc="Select clk_a0_dig" />
+          <value name="MX_STROBE_CLK_A1_DIG" value="101" desc="Select clk_a1_dig" />
+          <value name="MX_STROBE_CLK_A2_DIG" value="110" desc="Select clk_a2_dig" />
+          <value name="MX_STROBE_CLK_A3_DIG" value="111" desc="Select clk_a3_dig" />
+        </field>
+        <field name="strobe_en" from="3" to="3" access="RW" resetVal="" desc="Strobe gating control (See mx_strobe==3'h0)" hidden="false">
+          <value name="STROBE_EN_0" value="0" desc="disable strobe" />
+          <value name="STROBE_EN_1" value="1" desc="enable strobe" />
+        </field>
+      </register>
+      <register name="VDAC8_DATA" address="0x40005B83" bitWidth="8" desc="DAC Data Register" hidden="false">
+        <field name="data" from="7" to="0" access="RW" resetVal="" desc="8 DAC Data bits" hidden="false" />
+      </register>
+    </block>
+    <block name="VirtualMux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="demux" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cydff_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="or_intern_clk" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="DacClk" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_noconnect_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="Wave2_DMA" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="Wave1_DMA" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_noconnect_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  </block>
+  <block name="Filter" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
+    <block name="DFB" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_5" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <register name="Filter_DFB_PM_ACT_CFG_Register" address="0x400043A6" bitWidth="8" desc="Active Mode Power Control Register" hidden="false">
+      <field name="en_dfb" from="4" to="4" access="RW" resetVal="" desc="Enable DFB(s). Populated subsystems are counted from the LSB." hidden="false">
+        <value name="Enable_dfb" value="1" desc="Enable Power to DFB" />
+        <value name="Disable_dfb" value="0" desc="Disable Power to DFB" />
       </field>
-      <field name="INTRENBL" from="4" to="4" access="RW" resetVal="" desc="Enables or disables the Interrupt" hidden="false">
-        <value name="ENABLED" value="1" desc="Interrupt enabled" />
-        <value name="DISABLED" value="0" desc="Interrupt disabled" />
+    </register>
+    <register name="Filter_DFB_PM_STBY_CFG_Register" address="0x400043B6" bitWidth="8" desc="Alternate Active Mode Power Control Register" hidden="false">
+      <field name="en_dfb" from="4" to="4" access="RW" resetVal="" desc="Enable DFB(s). Populated subsystems are counted from the LSB." hidden="false">
+        <value name="Enable_dfb" value="1" desc="Enable Power to DFB during standby power mode" />
+        <value name="Disable_dfb" value="0" desc="Disable Power to DFB" />
       </field>
-      <field name="FIFO1LEVEL" from="3" to="3" access="RW" resetVal="" desc="FIFO level" hidden="false">
-        <value name="ENABLED" value="1" desc="FIFO LVL: input mode: FIFO at least 1/2 empty; output mode: FIFO at least 1/2 full" />
-        <value name="DISABLED" value="0" desc="FIFO LVL: input mode: FIFO not full; output mode: FIFO not empty" />
+    </register>
+    <register name="Filter_Control_Register" address="0x4000C780" bitWidth="8" desc="DFB Control Register" hidden="false">
+      <field name="CORECLK_DISABLE" from="2" to="2" access="RW" resetVal="" desc="This bit when set high disables (gates off) the clock to the entire core of the block. This includes all FFs except those used for the AHB interface and CSRs and all 6 RAMs. When disabled (set high) the AHB interface to the CSR is still fully functional. This bit is ANDed with the primary input signal dfb_clk_en to control the clock gate. dfb_clk_en must be high and CoreCLK_Disable must be low for the clock to run." hidden="false">
+        <value name="CORECLK_DISABLE_LOW" value="0" desc="Core Clock is Enabled" />
+        <value name="CORECLK_DISABLE_HIGH" value="1" desc="Core Clock is Disabled (gated)" />
       </field>
-      <field name="FIFO0LEVEL" from="2" to="2" access="RW" resetVal="" desc="FIFO level" hidden="false">
-        <value name="ENABLED" value="1" desc="FIFO LVL: input mode: FIFO at least 1/2 empty; output mode: FIFO at least 1/2 full" />
-        <value name="DISABLED" value="0" desc="FIFO LVL: input mode: FIFO not full; output mode: FIFO not empty" />
+      <field name="ADD6" from="1" to="1" access="RW" resetVal="" desc="This bit is literally address bit 5 (6th bit) of the FSM RAM when addressed by the DFB Controller. It has no affect on the FSM RAM when addressed on the AHB interface. It controls the Banking feature of the FSM." hidden="false">
+        <value name="ADDR6_LOW" value="0" desc="ADDR6 is Low" />
+        <value name="ADDR6_HIGH" value="1" desc="ADDR6 is HIGH" />
       </field>
-      <field name="FIFO1CLEAR" from="1" to="1" access="RW" resetVal="" desc="FIFO clear" hidden="false">
-        <value name="ENABLED" value="1" desc="Clear FIFO state" />
-        <value name="DISABLED" value="0" desc="Normal FIFO operation" />
+      <field name="RUN" from="0" to="0" access="RW" resetVal="" desc="Setting this bit to 1 enables the DFB to run. Setting it to 0 forces the next state address of the FSM to zero of the active Bank, reinitializes the ACU's and PC's and clears the round flag, saturation flag, saturation detect flag and all 6 extended Enables in the Controller." hidden="false">
+        <value name="RUN_DIS" value="0" desc="DFB operation is halted" />
+        <value name="RUN_EN" value="1" desc="DFB is enabled to operate." />
       </field>
-      <field name="FIFO0CLEAR" from="0" to="0" access="RW" resetVal="" desc="FIFO clear" hidden="false">
-        <value name="ENABLED" value="1" desc="Clear FIFO state" />
-        <value name="DISABLED" value="0" desc="Normal FIFO operation" />
+    </register>
+    <register name="Filter_Status_Register" address="0x4000C784" bitWidth="8" desc="DFB Status Register" hidden="false">
+      <field name="INTR_SEM2" from="7" to="7" access="RW" resetVal="" desc="If this bit is high, semaphore register bit 2 is a source of the current interrupt. Write a '1' to this bit to clear it." hidden="false">
+        <value name="SEM2_OFF" value="0" desc="Indicates no pending Semaphore 2 Interrupt." />
+        <value name="SEM2_ON" value="1" desc="Indicates a pending Semaphore 2 Interrupt." />
+      </field>
+      <field name="INTR_SEM1" from="6" to="6" access="RW" resetVal="" desc="If this bit is high, semaphore register bit 1 is a source of the current interrupt. Write a '1' to this bit to clear it." hidden="false">
+        <value name="SEM1_OFF" value="0" desc="Indicates no pending Semaphore 1 Interrupt." />
+        <value name="SEM1_ON" value="1" desc="Indicates a pending Semaphore 1 Interrupt." />
+      </field>
+      <field name="INTR_SEM0" from="5" to="5" access="RW" resetVal="" desc="If this bit is high, semaphore register bit 0 is a source of the current interrupt. Write a '1' to this bit to clear it." hidden="false">
+        <value name="SEM0_OFF" value="0" desc="Indicates no pending Semaphore 0 Interrupt." />
+        <value name="SEM0_ON" value="1" desc="Indicates a pending Semaphore 0 Interrupt." />
+      </field>
+      <field name="INTR_HOLDB" from="4" to="4" access="RW" resetVal="" desc="If this bit is high, Holding register B is a source of the current interrupt. Write a '1' to this bit to clear it. Reading the Holding register B also clears this bit." hidden="false">
+        <value name="HOLDB_OFF" value="0" desc="Indicates no pending Holding B Register Interrupt." />
+        <value name="HOLDB_ON" value="1" desc="Indicates a pending Holding B Register Interrupt." />
+      </field>
+      <field name="INTR_HOLDA" from="3" to="3" access="RW" resetVal="" desc="If this bit is high, Holding register A is a source of the current interrupt. Write a '1' to this bit to clear it. Reading the Holding register A also clears this bit." hidden="false">
+        <value name="HOLDA_OFF" value="0" desc="Indicates no pending Holding A Register Interrupt." />
+        <value name="HOLDA_ON" value="1" desc="Indicates a pending Holding A Register Interrupt." />
+      </field>
+      <field name="RND_MODE" from="2" to="2" access="R" resetVal="" desc="Indicates that the DP is in Round mode - meaning that any result passing out of the DP unit is being rounded to a 16-bit value." hidden="false">
+        <value name="RND_OFF" value="0" desc="Indicates Round Mode is off." />
+        <value name="RND_ON" value="1" desc="Indicates Round Mode is on." />
+      </field>
+      <field name="SAT_MODE" from="1" to="1" access="R" resetVal="" desc="Indicates that the DP unit is in Saturation mode." hidden="false">
+        <value name="SAT_OFF" value="0" desc="Indicates Saturation mode is off." />
+        <value name="SAT_ON" value="1" desc="Indicates Saturation mode is on." />
+      </field>
+      <field name="RAM_SEL" from="0" to="0" access="R" resetVal="" desc="This bit indicates which Control Store memory is in use, RAM A or RAM B." hidden="false">
+        <value name="RAMSEL_LOW" value="0" desc="Control Store memory A is in use." />
+        <value name="RAMSEL_HIGH" value="1" desc="Control Store memory B is in use." />
+      </field>
+    </register>
+    <register name="Filter_DFB_RAM_EN_Register" address="0x4000C788" bitWidth="8" desc="DFB Ram Enable Register" hidden="false">
+      <field name="RAMWR_ADDRING" from="7" to="6" access="RW" resetVal="" desc="These two bits control the write addressing of the 4 largest RAMs embedded in the DFB (CS-A, CS-B, Data-A, Data-B). The setting of these bits allows overlaid writes to occur to these memories when it is desired to fill them with like data." hidden="false">
+        <value name="NO_OVERLAY" value="0" desc="No overlay mapping." />
+        <value name="OVERLAY_CS_A_CS_B" value="1" desc="Overlay CS A with CS B." />
+        <value name="OVERLAY_DATA_A_DATA_B" value="10" desc="Overlay Data A with Data B." />
+        <value name="OVERLAY_CS_AB_DATA_AB" value="11" desc="Overlay CS A/B with Data A with DATA B." />
+      </field>
+      <field name="DPB_EN" from="5" to="5" access="RW" resetVal="" desc="Datapath RAM B RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+      <field name="DPA_EN" from="4" to="4" access="RW" resetVal="" desc="Datapath RAM A RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+      <field name="ACU_EN" from="3" to="3" access="RW" resetVal="" desc="ACU RAM RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+      <field name="CSB_EN" from="2" to="2" access="RW" resetVal="" desc="Control Store RAM B RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+      <field name="CSA_EN" from="1" to="1" access="RW" resetVal="" desc="Control Store RAM A RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+      <field name="FSM_EN" from="0" to="0" access="RW" resetVal="" desc="FSM RAM RAM enable / disable." hidden="false">
+        <value name="RAM_DIS" value="0" desc="RAM is disabled." />
+        <value name="RAM_EN" value="1" desc="RAM is enabled." />
+      </field>
+    </register>
+    <register name="Filter_RAM_DIR_Register" address="0x4000C78C" bitWidth="8" desc="DFB RAM Direction Register. This register controls the DFB memory direction. These bits control if each RAM of this block is embedded to the DFB function or mapped in the system address space on the AHB bus. " hidden="false">
+      <field name="SNP_DABLE" from="6" to="6" access="RW" resetVal="" desc="The CS and DP RAMs (optionally the FSM) have address snooping logic that watches for redundant back-to-back RD cycles and disables the RAM to conserve power. Writing a 1 to this bit disables this logic for all RAMs." hidden="false">
+        <value name="SNP_ENABLE" value="0" desc="Enabled" />
+        <value name="SNP_DISABLE" value="1" desc="Disabled" />
+      </field>
+      <field name="DPB_DIR" from="5" to="5" access="RW" resetVal="" desc="Datapath RAM B RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+      <field name="DPA_DIR" from="4" to="4" access="RW" resetVal="" desc="Datapath RAM A RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+      <field name="ACU_DIR" from="3" to="3" access="RW" resetVal="" desc="ACU RAM RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+      <field name="CSB_DIR" from="2" to="2" access="RW" resetVal="" desc="Control Store RAM B RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+      <field name="CSA_DIR" from="1" to="1" access="RW" resetVal="" desc="Control Store RAM B RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+      <field name="FSM_DIR" from="0" to="0" access="RW" resetVal="" desc="FSM RAM RAM Direction." hidden="false">
+        <value name="RAM_DFB" value="0" desc="DFB" />
+        <value name="RAM_AHB" value="1" desc="System Bus" />
+      </field>
+    </register>
+    <register name="Filter_DFB_SEMA_Register" address="0x4000C790" bitWidth="8" desc="DFB Semaphore Register" hidden="false">
+      <field name="SEMA_MASK" from="6" to="4" access="W" resetVal="" desc="These bits are used to mask writes to bits 2-0. They are write-only. If bit 4 is a 1 then the value on bit 0 will be written to SEM0, otherwise SEM0 will not be altered. Likewise for MASK1 and SEM1, and MASK2 and SEM2." hidden="false" />
+      <field name="SEMA" from="2" to="0" access="RW" resetVal="" desc="These bits are used to pass semaphores between the DFB Controller and the System SW. Their definition is user defined. There is no HW implementing an arbitration methodology should both the System and Control access the same SEM bit at the same time." hidden="false" />
+    </register>
+    <register name="Filter_DSI_Control_Register" address="0x4000C794" bitWidth="8" desc="DFB Global Cotrol Register" hidden="false">
+      <field name="GBL2_OUT" from="3" to="2" access="RW" resetVal="" desc="These bits are used to control what internal signals are mapped to the primary output signal dfb_globalo2." hidden="false">
+        <value name="SEM2" value="0" desc="Semaphore Bit 2. This is the same signal described in the DFB0_SEMA CSR." />
+        <value name="DPSIGN" value="1" desc="Datapath Sign. This signal asserts anytime the output of the ALU in the Datapath unit is negative. It will remain high for each cycle this condition is true." />
+        <value name="DPTHREASH" value="10" desc="Datapath Threashold Crossed. This signal asserts anytime the threashold of 0 is crossed in the ALU when one of the following instructions is executing: TDECA, TSUBA, TSUBB, TADDABSA, TADDABSB. It will remain high for each cycle this condition is true." />
+        <value name="DPEQ" value="11" desc="Datapath ALU=0. This signal asserts high when the output of the ALU in the Datapath unit equals 0 and one of the following ALU commands is executing: TDECA, TSUBA, TSUBB, TADDABSA, TADDABSB. It will remain high for each cycle this condition is true." />
+      </field>
+      <field name="GBL1_OUT" from="1" to="0" access="RW" resetVal="" desc="These bits are used to control what internal signals are mapped to the primary output signal dfb_globalo1." hidden="false">
+        <value name="DFB_RUN" value="0" desc="DFB RUN Bit. This is the same bit as the RUN bit in the DFB0_CR register." />
+        <value name="SEM0" value="1" desc="Semaphore Bit 0. This is the same signal described in the DFB0_SEMA CSR." />
+        <value name="SEM1" value="10" desc="Semaphore Bit 1. This is the same signal described in the DFB0_SEMA CSR." />
+        <value name="DFB_INTR" value="11" desc="DFB Interrupt. This is the same signal as the primary dfb_intr output signal." />
+      </field>
+    </register>
+    <register name="Filter_Interrupt_Control_Register" address="0x4000C798" bitWidth="8" desc="DFB Interrupt Control Register" hidden="false">
+      <field name="SEMA2_EN" from="4" to="4" access="RW" resetVal="" desc="If this bit is set high, an interrupt is generated each time a 1 is written into the semaphore register bit 2." hidden="false">
+        <value name="ENABLE_SEMAPHORE_2_IRQ_DIS" value="0" desc="Semaphore register interrupt masked." />
+        <value name="ENABLE_SEMAPHORE_2_IRQ_EN" value="1" desc="Interrupt is generated each time a 1 is written to the semaphore register." />
+      </field>
+      <field name="SEMA1_EN" from="3" to="3" access="RW" resetVal="" desc="If this bit is set high, an interrupt is generated each time a 1 is written into the semaphore register bit 1." hidden="false">
+        <value name="ENABLE_SEMAPHORE_1_IRQ_DIS" value="0" desc="Semaphore register interrupt masked." />
+        <value name="ENABLE_SEMAPHORE_1_IRQ_EN" value="1" desc="Interrupt is generated each time a 1 is written to the semaphore register." />
+      </field>
+      <field name="SEMA0_EN" from="2" to="2" access="RW" resetVal="" desc="If this bit is set high, an interrupt is generated each time a 1 is written into the semaphore register bit 0." hidden="false">
+        <value name="ENABLE_SEMAPHORE_0_IRQ_DIS" value="0" desc="Semaphore register interrupt masked." />
+        <value name="ENABLE_SEMAPHORE_0_IRQ_EN" value="1" desc="Interrupt is generated each time a 1 is written to the semaphore register." />
+      </field>
+      <field name="HOLDB_EN" from="1" to="1" access="RW" resetVal="" desc="If this bit is set high, an interrupt is generated each time new valid data is written into the output Holding register B." hidden="false">
+        <value name="ENABLE_HOLDING_B_IRQ_DIS" value="0" desc="Holding register interrupt masked." />
+        <value name="ENABLE_HOLDING_B_IRQ_EN" value="1" desc="Interrupt is generated each time new valid data is written inot the output Holding B register." />
+      </field>
+      <field name="HOLDA_EN" from="0" to="0" access="RW" resetVal="" desc="If this bit is set high, an interrupt is generated each time new valid data is written into the output Holding register A." hidden="false">
+        <value name="ENABLE_HOLDING_A_IRQ_DIS" value="0" desc="Holding register interrupt masked." />
+        <value name="ENABLE_HOLDING_A_IRQ_EN" value="1" desc="Interrupt is generated each time new valid data is written inot the output Holding A register." />
+      </field>
+    </register>
+    <register name="Filter_DMA_Control_Register" address="0x4000C79C" bitWidth="8" desc="DFB DMAREQ Control Register" hidden="false">
+      <field name="DMAREQ2" from="3" to="2" access="RW" resetVal="" desc="The value in these two bits selects which event drives dma_req2." hidden="false">
+        <value name="DMAREQ2_DISABLED" value="0" desc="Disabled" />
+        <value name="DMAREQ2_HOLDING_REG_B" value="1" desc="New data in Holding Register B." />
+        <value name="DMAREQ2_SEMAPHORE_0" value="10" desc="Semaphore 0." />
+        <value name="DMAREQ2_SEMAPHORE_1" value="11" desc="Semaphore 1." />
+      </field>
+      <field name="DMAREQ1" from="1" to="0" access="RW" resetVal="" desc="The value in these two bits selects which event drives dma_req1." hidden="false">
+        <value name="DMAREQ1_DISABLED" value="0" desc="Disabled" />
+        <value name="DMAREQ1_HOLDING_REG_A" value="1" desc="New data in Holding Register A." />
+        <value name="DMAREQ1_SEMAPHORE_0" value="10" desc="Semaphore 0." />
+        <value name="DMAREQ1_SEMAPHORE_1" value="11" desc="Semaphore 1." />
+      </field>
+    </register>
+    <register name="Filter_STAGEA_Register" address="0x4000C7A0" bitWidth="8" desc="DFB_STAGEA (Input Low Byte) Register" hidden="false">
+      <field name="STGA_LOW" from="7" to="0" access="RW" resetVal="" desc="This is the low byte of the Streaming input Staging Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_STAGEAM_Register" address="0x4000C7A1" bitWidth="8" desc="DFB_STAGEAM (Input Middle Byte) Register" hidden="false">
+      <field name="STGA_MID" from="7" to="0" access="RW" resetVal="" desc="This is the middle byte of the Streaming input Staging Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_STAGEAH_Register" address="0x4000C7A2" bitWidth="8" desc="DFB_STAGEAH (Input High Byte) Register" hidden="false">
+      <field name="STGA_HIGH" from="7" to="0" access="RW" resetVal="" desc="This is the high byte of the Streaming input Staging Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_STAGEB_Register" address="0x4000C7A4" bitWidth="8" desc="DFB_STAGEB (Input Low Byte) Register" hidden="false">
+      <field name="STGB_LOW" from="7" to="0" access="RW" resetVal="" desc="This is the low byte of the Streaming input Staging Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_STAGEBM_Register" address="0x4000C7A5" bitWidth="8" desc="DFB_STAGEBM (Input Middle Byte) Register" hidden="false">
+      <field name="STGB_MID" from="7" to="0" access="RW" resetVal="" desc="This is the middle byte of the Streaming input Staging Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_STAGEBH_Register" address="0x4000C7A6" bitWidth="8" desc="DFB_STAGEBH (Input High Byte) Register" hidden="false">
+      <field name="STGB_HIGH" from="7" to="0" access="RW" resetVal="" desc="This is the high byte of the Streaming input Staging Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_HOLDA_Register" address="0x4000C7A8" bitWidth="8" desc="DFB_HOLDA (Output Low Byte) Register" hidden="false">
+      <field name="HOLDA_LOW" from="7" to="0" access="R" resetVal="" desc="This is the low byte of the output Holding Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_HOLDAM_Register" address="0x4000C7A9" bitWidth="8" desc="DFB_HOLDAM (Output Middle Byte) Register" hidden="false">
+      <field name="HOLDA_MID" from="7" to="0" access="R" resetVal="" desc="This is the middle byte of the output Holding Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_HOLDAH_Register" address="0x4000C7AA" bitWidth="8" desc="DFB_HOLDAH (Output High Byte) Register" hidden="false">
+      <field name="HOLDA_HIGH" from="7" to="0" access="R" resetVal="" desc="This is the high byte of the output Holding Register - Port A." hidden="false" />
+    </register>
+    <register name="Filter_HOLDB_Register" address="0x4000C7AC" bitWidth="8" desc="DFB_HOLDB (Output Low Byte) Register" hidden="false">
+      <field name="HOLDB_LOW" from="7" to="0" access="R" resetVal="" desc="This is the low byte of the output Holding Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_HOLDBM_Register" address="0x4000C7AD" bitWidth="8" desc="DFB_HOLDBM (Output Middle Byte) Register" hidden="false">
+      <field name="HOLDB_MID" from="7" to="0" access="R" resetVal="" desc="This is the middle byte of the output Holding Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_HOLDBH_Register" address="0x4000C7AE" bitWidth="8" desc="DFB_HOLDBH (Output High Byte) Register" hidden="false">
+      <field name="HOLDB_HIGH" from="7" to="0" access="R" resetVal="" desc="This is the high byte of the output Holding Register - Port B." hidden="false" />
+    </register>
+    <register name="Filter_DFB_COHER_Register" address="0x4000C7B0" bitWidth="8" desc="DFB Coherency Register" hidden="false">
+      <field name="holdb_key" from="7" to="6" access="RW" resetVal="" desc="Sets the Key Coherency Byte of the Holding B register" hidden="false">
+        <value name="HOLDB_KEY_LOW" value="0" desc="Key Byte is low byte." />
+        <value name="HOLDB_KEY_MID" value="1" desc="Key Byte is middle byte." />
+        <value name="HOLDB_KEY_HIGH" value="10" desc="Key Byte is high byte." />
+      </field>
+      <field name="holda_key" from="5" to="4" access="RW" resetVal="" desc="Sets the Key Coherency Byte of the Holding A register" hidden="false">
+        <value name="HOLDA_KEY_LOW" value="0" desc="Key Byte is low byte." />
+        <value name="HOLDA_KEY_MID" value="1" desc="Key Byte is middle byte." />
+        <value name="HOLDA_KEY_HIGH" value="10" desc="Key Byte is high byte." />
+      </field>
+      <field name="stgb_key" from="3" to="2" access="RW" resetVal="" desc="Sets the Key Coherency Byte of the Staging B register." hidden="false">
+        <value name="STGB_KEY_LOW" value="0" desc="Key Byte is low byte." />
+        <value name="STGB_KEY_MID" value="1" desc="Key Byte is middle byte." />
+        <value name="STGB_KEY_HIGH" value="10" desc="Key Byte is high byte." />
+      </field>
+      <field name="stga_key" from="1" to="0" access="RW" resetVal="" desc="Sets the Key Coherency Byte of the Staging A register." hidden="false">
+        <value name="STGA_KEY_LOW" value="0" desc="Key Byte is low byte." />
+        <value name="STGA_KEY_MID" value="1" desc="Key Byte is middle byte." />
+        <value name="STGA_KEY_HIGH" value="10" desc="Key Byte is high byte." />
+      </field>
+    </register>
+    <register name="Filter_DFB_DALIGN_Register" address="0x4000C7B4" bitWidth="8" desc="DFB Data Align Register" hidden="false">
+      <field name="holdb_dalign" from="3" to="3" access="RW" resetVal="" desc="Shifts the read right by a byte." hidden="false">
+        <value name="HOLDB_DALIGN_LOW" value="0" desc="Reads normally." />
+        <value name="HOLDB_DALIGN_HIGH" value="1" desc="Reads shifted right by 8-bits." />
+      </field>
+      <field name="holda_dalign" from="2" to="2" access="RW" resetVal="" desc="Shifts the read right by a byte." hidden="false">
+        <value name="HOLDA_DALIGN_LOW" value="0" desc="Reads normally." />
+        <value name="HOLDA_DALIGN_HIGH" value="1" desc="Reads shifted right by 8-bits." />
+      </field>
+      <field name="stgb_dalign" from="1" to="1" access="RW" resetVal="" desc="Shifts the write left by a byte." hidden="false">
+        <value name="STGB_DALIGN_LOW" value="0" desc="Writes normally." />
+        <value name="STGB_DALIGN_HIGH" value="1" desc="Writes shifted left by 8-bits." />
+      </field>
+      <field name="stga_dalign" from="0" to="0" access="RW" resetVal="" desc="Shifts the write left by a byte." hidden="false">
+        <value name="STGA_DALIGN_LOW" value="0" desc="Writes normally." />
+        <value name="STGA_DALIGN_HIGH" value="1" desc="Writes shifted left by 8-bits." />
       </field>
     </register>
   </block>
-  <block name="Control_Reg" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false">
-    <register name="Control_Reg_CONTROL_REG" address="0x40006478" bitWidth="8" desc="" hidden="false" />
+  <block name="adcISR" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="ADC_SAR" BASE="0x0" SIZE="0x0" desc="SAR ADC" visible="true" hidden="false">
+    <block name="theACLK" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ADC_SAR" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="Clock_VirtualMux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_7" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_6" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_5" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_noconnect_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="or_internalClock" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="noconnect_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="vRef_1024" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="Bypass" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="noconnect" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_constant_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="cy_analog_virtualmux_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <block name="IRQ" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+    <register name="SAR_TR0" address="0x40004616" bitWidth="8" desc="SAR trim register" hidden="false" />
+    <register name="SAR_CSR0" address="0x40005908" bitWidth="8" desc="SAR status and control register 0" hidden="false" />
+    <register name="SAR_CSR1" address="0x40005909" bitWidth="8" desc="SAR status and control register 1" hidden="false" />
+    <register name="SAR_CSR2" address="0x4000590A" bitWidth="8" desc="SAR status and control register 2" hidden="false" />
+    <register name="SAR_CSR3" address="0x4000590B" bitWidth="8" desc="SAR status and control register 3" hidden="false" />
+    <register name="SAR_CSR4" address="0x4000590C" bitWidth="8" desc="SAR status and control register 4" hidden="false" />
+    <register name="SAR_CSR5" address="0x4000590D" bitWidth="8" desc="SAR status and control register 5" hidden="false" />
+    <register name="SAR_CSR6" address="0x4000590E" bitWidth="8" desc="SAR status and control register 6" hidden="false" />
+    <register name="SAR_SW0" address="0x40005B28" bitWidth="8" desc="SAR Analog Routing Register 0" hidden="false" />
+    <register name="SAR_SW2" address="0x40005B2A" bitWidth="8" desc="SAR Analog Routing Register 2" hidden="false" />
+    <register name="SAR_SW3" address="0x40005B2B" bitWidth="8" desc="SAR Analog Routing Register 3" hidden="false" />
+    <register name="SAR_SW4" address="0x40005B2C" bitWidth="8" desc="SAR Analog Routing Register 4" hidden="false" />
+    <register name="SAR_SW6" address="0x40005B2E" bitWidth="8" desc="SAR Analog Routing Register 6" hidden="false" />
+    <register name="SAR_CLK" address="0x40005B2F" bitWidth="8" desc="SAR Clock Selection Register" hidden="false" />
+    <register name="SAR_WRK" address="0x40005BA2" bitWidth="16" desc="SAR working register" hidden="false" />
   </block>
 </blockRegMap>

@@ -3,7 +3,54 @@
   <Group key="Clock2">
     <Data key="ClockSolver" value="1" />
     <Group key="DesigneWideClks" />
-    <Group key="LocalClks" />
+    <Group key="LocalClks">
+      <Group key="1c9578a8-a9a4-446b-b738-8f08cba7f0ea/77086516-855e-4b7b-abbe-47b22f8543de">
+        <Data key="check_tolerance" value="True" />
+        <Data key="clock_version" value="v1" />
+        <Data key="derive_type" value="AUTO" />
+        <Data key="desired_freq" value="1000000" />
+        <Data key="desired_unit" value="0" />
+        <Data key="divider" value="72" />
+        <Data key="domain" value="DIGITAL" />
+        <Data key="enabled" value="True" />
+        <Data key="minus_accuracy" value="1" />
+        <Data key="minus_tolerance" value="5" />
+        <Data key="name" value="WaveDAC8_DacClk" />
+        <Data key="netlist_name" value="\WaveDAC8:DacClk\" />
+        <Data key="placement" value="AUTO" />
+        <Data key="plus_accuracy" value="1" />
+        <Data key="plus_tolerance" value="5" />
+        <Data key="scope" value="LOCAL" />
+        <Data key="src_clk_id" value="61737EF6-3B74-48f9-8B91-F7473A442AE7" />
+        <Data key="src_clk_name" value="MASTER_CLK" />
+        <Data key="start_on_reset" value="True" />
+        <Data key="sync_with_bus_clk" value="True" />
+        <Data key="user_set_domain" value="False" />
+      </Group>
+      <Group key="6b1fad3c-3cc3-4d6a-9534-091d0637350d/696a0979-21fc-4185-bf38-6c79febcde7a">
+        <Data key="check_tolerance" value="False" />
+        <Data key="clock_version" value="v1" />
+        <Data key="derive_type" value="AUTO" />
+        <Data key="desired_freq" value="18000000" />
+        <Data key="desired_unit" value="0" />
+        <Data key="divider" value="4" />
+        <Data key="domain" value="DIGITAL" />
+        <Data key="enabled" value="True" />
+        <Data key="minus_accuracy" value="1" />
+        <Data key="minus_tolerance" value="5" />
+        <Data key="name" value="ADC_SAR_theACLK" />
+        <Data key="netlist_name" value="\ADC_SAR:theACLK\" />
+        <Data key="placement" value="AUTO" />
+        <Data key="plus_accuracy" value="1" />
+        <Data key="plus_tolerance" value="5" />
+        <Data key="scope" value="LOCAL" />
+        <Data key="src_clk_id" value="61737EF6-3B74-48f9-8B91-F7473A442AE7" />
+        <Data key="src_clk_name" value="MASTER_CLK" />
+        <Data key="start_on_reset" value="True" />
+        <Data key="sync_with_bus_clk" value="True" />
+        <Data key="user_set_domain" value="False" />
+      </Group>
+    </Group>
     <Group key="SourceClks" />
     <Group key="SystemClks">
       <Group key="1F7CF08C-1B36-4851-9441-035049A4211B">
@@ -33,10 +80,10 @@
         <Data key="check_tolerance" value="True" />
         <Data key="clock_version" value="v1" />
         <Data key="derive_type" value="BUILTIN" />
-        <Data key="desired_freq" value="24" />
+        <Data key="desired_freq" value="72" />
         <Data key="desired_unit" value="6" />
         <Data key="divider" value="0" />
-        <Data key="domain" value="DIGITAL" />
+        <Data key="domain" value="0" />
         <Data key="enabled" value="True" />
         <Data key="minus_accuracy" value="1" />
         <Data key="minus_tolerance" value="0" />
@@ -244,11 +291,16 @@
   <Group key="Component">
     <Group key="v1">
       <Data key="cy_boot" value="cy_boot_v5_60" />
+      <Data key="Em_EEPROM_Dynamic" value="Em_EEPROM_Dynamic_v2_0" />
       <Data key="LIN_Dynamic" value="LIN_Dynamic_v4_0" />
     </Group>
   </Group>
   <Data key="DataVersionKey" value="2" />
   <Group key="DWRInstGuidMapping">
+    <Group key="Clock">
+      <Data key="1c9578a8-a9a4-446b-b738-8f08cba7f0ea/77086516-855e-4b7b-abbe-47b22f8543de" value="WaveDAC8_DacClk" />
+      <Data key="6b1fad3c-3cc3-4d6a-9534-091d0637350d/696a0979-21fc-4185-bf38-6c79febcde7a" value="ADC_SAR_theACLK" />
+    </Group>
     <Group key="Pin">
       <Data key="8d318d8b-cf7b-4b6b-b02c-ab1c5c49d0ba" value="micClk" />
       <Data key="89c5aa7a-1eb9-4506-b547-d915d028522b" value="micData" />
