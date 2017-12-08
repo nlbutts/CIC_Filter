@@ -4,17 +4,15 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
+#include "tclap/CmdLine.h"
 
-using std::cout;
-using std::endl;
-using std::vector;
-using std::ifstream;
-using std::string;
+using namespace TCLAP;
+using namespace std;
 
 uint32_t executeCIC(uint16_t *x, int32_t * y, uint32_t len)
 {
     #define N 4
-    #define R 10
+    #define R 32
     static int32_t sigma[N]  = {0};
     static int32_t delta[N]  = {0};
     static int32_t pDelta[N] = {0};
@@ -28,7 +26,8 @@ uint32_t executeCIC(uint16_t *x, int32_t * y, uint32_t len)
 
         for (uint32_t n = 0; n < R; n++)
         {
-            sigma[0] += x[(i*R)+n];
+            int16_t temp = *x++;
+            sigma[0] += (temp - 2048);
             sigma[1] += sigma[0];
             sigma[2] += sigma[1];
             sigma[3] += sigma[2];
@@ -72,15 +71,39 @@ void saveCSV(std::string file, vector<int32_t> data)
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
-    auto in = "../datain.csv";
-    auto out = "../dataout.csv";
-    auto x = loadCSV(in);
+    // Wrap everything in a try block.  Do this every time, 
+    // because exceptions will be thrown for problems. 
+    try {  
 
-    vector<int32_t> y(x.size() / 10);
+    // Define the command line object.
+    CmdLine cmd("CIC filter test R=32 N=4 M=1", ' ', "0.1");
 
+    // Define a value argument and add it to the command line.
+    ValueArg<string> inputFile("i","input","input file",true,"","string");
+    cmd.add( inputFile );
+    ValueArg<string> outputFile("o","output","output file",true,"","string");
+    cmd.add( outputFile );
+
+    // Parse the args.
+    cmd.parse( argc, argv );
+
+    // Get the value parsed by each arg. 
+    std::string input = inputFile.getValue();
+    std::string output = outputFile.getValue();
+
+
+    auto x = loadCSV(input);
+
+    vector<int32_t> y(x.size() / 32);
+
+    cout << "Loaded " << x.size() << " Samples" << endl;
     executeCIC(x.data(), y.data(), y.size());
 
-    saveCSV(out, y);
+    cout << "Saving data to file." << endl;
+
+    saveCSV(output, y);
+    } catch (ArgException &e)  // catch any exceptions
+    { cerr << "error: " << e.error() << " for arg " << e.argId() << endl; }
 }
